@@ -1,0 +1,33 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+    background: white;
+    border-radius: 8px;
+    margin-top: 40px;
+}
+h1 { color: purple; }
+input {
+    padding: 8px;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+button {
+    padding: 8px 16px;
+    font-size: 16px;
+    background-color: purple;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+button:hover {
+    background-color: darkviolet;
+}
