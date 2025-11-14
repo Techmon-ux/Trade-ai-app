@@ -1,35 +1,33 @@
 let chart;
 let lastSignal = '';
+let intervalId;
+
 const fetchBtn = document.getElementById('fetchBtn');
 const symbolInput = document.getElementById('symbol');
 const assetTypeSelect = document.getElementById('assetType');
 const signalEl = document.getElementById('signal');
 const explanationEl = document.getElementById('explanation');
 const autoRefreshCheckbox = document.getElementById('autoRefresh');
-let intervalId;
 
-// Fetch button click
 fetchBtn.addEventListener('click', fetchData);
-
-// Auto-refresh
 autoRefreshCheckbox.addEventListener('change', () => {
     if(autoRefreshCheckbox.checked) startAutoRefresh();
     else stopAutoRefresh();
 });
 
+// Auto-refresh setup
 function startAutoRefresh() {
     stopAutoRefresh();
-    intervalId = setInterval(() => fetchData(), 60*1000); // every 1 min
+    intervalId = setInterval(fetchData, 60*1000); // every 1 minute
 }
-
 function stopAutoRefresh() {
     if(intervalId) clearInterval(intervalId);
 }
 
-// Fetch data
+// Fetch data based on asset type
 async function fetchData() {
     const assetType = assetTypeSelect.value;
-    let symbol = symbolInput.value.toLowerCase().trim();
+    const symbol = symbolInput.value.toLowerCase().trim();
 
     if(assetType === 'crypto') {
         await fetchCrypto(symbol);
@@ -66,13 +64,13 @@ async function fetchCrypto(symbol) {
         signalEl.textContent = `Signal: ${signal}`;
         explanationEl.textContent = `RSI: ${latestRSI.toFixed(2)}, SMA50: ${latestSMA50.toFixed(2)}, SMA200: ${latestSMA200.toFixed(2)}, Price: ${latestClose.toFixed(2)}`;
 
-        renderChart(labels, closePrices, sma50, sma200, signal);
+        renderChart(labels, closePrices, sma50, sma200);
 
         // Browser notification
         if(signal !== lastSignal) {
             lastSignal = signal;
             if(signal !== 'HOLD' && Notification.permission === 'granted') {
-                new Notification(`Trading Signal: ${signal}`, { body: `Latest Price: ${latestClose.toFixed(2)}` });
+                new Notification(`Trading Signal: ${signal}`, { body: `Price: ${latestClose.toFixed(2)}` });
             }
         }
 
@@ -98,7 +96,7 @@ function calculateSMA(prices, period) {
 function calculateRSI(prices, period=14){
     const gains=[], losses=[], rsi=[];
     for(let i=1;i<prices.length;i++){
-        const diff=prices[i]-prices[i-1];
+        const diff = prices[i]-prices[i-1];
         gains.push(Math.max(0,diff));
         losses.push(Math.max(0,-diff));
         if(i>=period){
@@ -112,7 +110,7 @@ function calculateRSI(prices, period=14){
 }
 
 // ===== Chart =====
-function renderChart(labels, prices, sma50, sma200, signal){
+function renderChart(labels, prices, sma50, sma200){
     if(chart) chart.destroy();
     chart = new Chart(document.getElementById('chart').getContext('2d'), {
         type: 'line',
